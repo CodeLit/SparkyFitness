@@ -38,6 +38,7 @@ import {
   getTandoorFoodDetails,
   getNorishFoodDetails,
 } from '../../services/foodIntegrationService.js';
+import { withFoodHealthScore } from '@workspace/shared';
 
 const router = express.Router();
 
@@ -104,7 +105,7 @@ function normalizeFoodForResponse(food: unknown): unknown {
     return food;
   }
 
-  const record = food as Record<string, unknown>;
+  const record = withFoodHealthScore(food as Record<string, unknown>);
 
   return {
     ...record,

@@ -1,6 +1,10 @@
 import preferenceRepository from '../models/preferenceRepository.js';
 import { log } from '../config/logging.js';
-import { isValidTimeZone, SUPPORTED_TIME_FORMATS } from '@workspace/shared';
+import {
+  isValidTimeZone,
+  SUPPORTED_TIME_FORMATS,
+  FRONT_OF_PACK_REGIONS,
+} from '@workspace/shared';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function validateTimezone(preferenceData: any) {
   if (
@@ -62,12 +66,29 @@ async function validateGoalMode(preferenceData: any) {
     }
   }
 }
+async function validateFrontOfPackRegion(preferenceData: {
+  front_of_pack_region?: string;
+}) {
+  const value = preferenceData.front_of_pack_region;
+  if (
+    value !== undefined &&
+    !(FRONT_OF_PACK_REGIONS as readonly string[]).includes(value)
+  ) {
+    throw Object.assign(
+      new Error(
+        `Invalid front_of_pack_region: '${value}'. Must be one of: ${FRONT_OF_PACK_REGIONS.join(', ')}.`
+      ),
+      { status: 400 }
+    );
+  }
+}
 function getDefaultPreferences() {
   return {
     calorie_goal_adjustment_mode: 'dynamic',
     show_net_carbs: false,
     timezone: null,
     time_format: 'h:mm A',
+    front_of_pack_region: 'none',
   };
 }
 async function updateUserPreferences(
@@ -82,6 +103,7 @@ async function updateUserPreferences(
     await validateTimezone(preferenceData);
     await validateTimeFormat(preferenceData);
     await validateGoalMode(preferenceData);
+    await validateFrontOfPackRegion(preferenceData);
     const updatedPreferences = await preferenceRepository.updateUserPreferences(
       targetUserId,
       preferenceData
@@ -185,6 +207,7 @@ async function upsertUserPreferences(
     await validateTimezone(preferenceData);
     await validateTimeFormat(preferenceData);
     await validateGoalMode(preferenceData);
+    await validateFrontOfPackRegion(preferenceData);
     preferenceData.user_id = authenticatedUserId; // Ensure user_id is set from authenticated user
     // Provide a default for calorie_goal_adjustment_mode if it's not present
     if (!preferenceData.calorie_goal_adjustment_mode) {

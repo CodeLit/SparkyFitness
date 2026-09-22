@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { addDays, todayInZone } from '@workspace/shared';
+import { addDays, computeFoodHealthScore, todayInZone } from '@workspace/shared';
 import { log } from '../../config/logging.js';
 import foodCoreService from '../../services/foodCoreService.js';
 import foodEntryService from '../../services/foodEntryService.js';
@@ -585,8 +585,13 @@ const FULL_ENTRY_DROP: readonly string[] = [
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function projectCatalogFood(row: any) {
   const { default_variant: defaultVariant, ...rest } = row;
+  const healthScore = computeFoodHealthScore(row);
+  const hasHealthSignal =
+    healthScore.nutri_score !== null ||
+    Object.values(healthScore.warnings).some((list) => list.length > 0);
   return {
     ...compactRecord(rest, CATALOG_FOOD_DROP),
+    ...(hasHealthSignal ? { health_score: healthScore } : {}),
     variants: defaultVariant?.id
       ? [compactRecord(defaultVariant, VARIANT_DROP)]
       : [],

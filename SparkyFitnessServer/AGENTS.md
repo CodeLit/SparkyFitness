@@ -227,6 +227,8 @@ When searching, ignore noisy/generated directories unless you explicitly need th
   inspect the relevant `integrations/*` code, then the matching service and repository files
 - Health data or date bucketing issue:
   inspect `integrations/healthData/healthDataRoutes.ts`, `services/measurementService.ts`, and `utils/timezoneLoader.ts`
+- Nutri-Score or front-of-pack ("high in") warnings on foods:
+  the scoring is `../shared/src/nutrients/foodHealthScore.ts` (`computeFoodHealthScore`, tested in `tests/foodHealthScore.test.ts`); it is attached on read as `health_score` in `services/foodCoreService.ts`, `services/favoritesService.ts`, `routes/v2/foodRoutes.ts` (`normalizeFoodForResponse`) and the chatbot catalog projection in `ai/tools/foodTools.ts`. Its inputs `foods.added_sugars` / `fruit_veg_legume_percent` / `provider_nutriscore_grade` are per 100 g/ml and NULL means unknown
 - Self-service "delete synced data by source" issue:
   inspect `routes/syncedDataRoutes.ts`, `services/syncedDataService.ts`, and `models/syncedDataRepository.ts` (the `SYNCED_SOURCE_TABLES` whitelist)
 - AI chat or chatbot tool issue:

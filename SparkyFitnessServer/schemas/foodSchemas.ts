@@ -1,4 +1,5 @@
 import { z } from 'zod/v4';
+import { FRONT_OF_PACK_WARNINGS, NUTRI_SCORE_GRADES } from '@workspace/shared';
 
 export const FoodVariantSchema = z.object({
   id: z.string().optional(),
@@ -48,6 +49,23 @@ export const FoodVariantSchema = z.object({
 
 export type FoodVariant = z.infer<typeof FoodVariantSchema>;
 
+const FrontOfPackWarningsSchema = z.array(z.enum(FRONT_OF_PACK_WARNINGS));
+
+export const FoodHealthScoreSchema = z.object({
+  nutri_score: z
+    .object({
+      grade: z.enum(NUTRI_SCORE_GRADES),
+      score: z.number().nullable(),
+      source: z.enum(['provider', 'computed']),
+    })
+    .nullable(),
+  warnings: z.object({
+    brazil: FrontOfPackWarningsSchema,
+    chile: FrontOfPackWarningsSchema,
+    mexico: FrontOfPackWarningsSchema,
+  }),
+});
+
 export const NormalizedFoodSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -66,6 +84,10 @@ export const NormalizedFoodSchema = z.object({
   image_source_url: z.string().nullable().optional(),
   // Local foods returned through this shape carry their stored array.
   images: z.array(z.string()).optional(),
+  added_sugars: z.number().nullable().optional(),
+  fruit_veg_legume_percent: z.number().nullable().optional(),
+  provider_nutriscore_grade: z.string().nullable().optional(),
+  health_score: FoodHealthScoreSchema.optional(),
   default_variant: FoodVariantSchema,
   variants: z.array(FoodVariantSchema).optional(),
 });
