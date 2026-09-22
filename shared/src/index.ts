@@ -99,6 +99,7 @@ export * from "./constants/exercise.ts";
 export * from "./constants/chatAskUser.ts";
 export * from "./nutrients/micronutrientCatalog.ts";
 export * from "./nutrients/macroPickerFields.ts";
+export * from "./nutrients/foodHealthScore.ts";
 export * from "./utils/timezone.ts";
 export * from "./utils/calendar.ts";
 export * from "./utils/entryTime.ts";
