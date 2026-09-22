@@ -2,6 +2,7 @@ import type { FoodItem, TopFoodItem } from './foods';
 import type { ExternalFoodItem, ExternalFoodVariant } from './externalFoods';
 import type { Meal, MealIngredientDraft } from './meals';
 import type { BarcodeFood } from '../services/api/externalFoodSearchApi';
+import type { NutriScoreResult } from '@workspace/shared';
 import { parseDecimalInput, toFiniteNumber } from '../utils/numericInput';
 
 /** Convert a numeric value to a form-compatible string. Returns '' for null/undefined. */
@@ -125,6 +126,7 @@ export interface FoodInfoItem {
   variantId?: string;
   externalVariants?: ExternalFoodVariant[];
   provider_verified?: boolean;
+  nutriScore?: NutriScoreResult | null;
   // Photos. `images` is set for already-saved foods and meals; the two URL
   // fields carry a provider result's photo before it has been imported, and
   // must survive as far as the create payload or the food is saved without
@@ -176,6 +178,7 @@ export const foodItemToFoodInfo = (item: FoodItem | TopFoodItem ): FoodInfoItem 
   customNutrients: item.default_variant.custom_nutrients ?? null,
   variantId: item.default_variant.id,
   images: item.images ?? null,
+  nutriScore: item.health_score?.nutri_score ?? null,
   source: 'local',
   originalItem: item,
 });

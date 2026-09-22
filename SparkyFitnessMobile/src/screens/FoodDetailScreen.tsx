@@ -8,6 +8,7 @@ import Button from '../components/ui/Button';
 import Icon from '../components/Icon';
 import BottomSheetPicker from '../components/BottomSheetPicker';
 import FoodNutritionSummary from '../components/FoodNutritionSummary';
+import NutriScoreBadge from '../components/NutriScoreBadge';
 import StatusView from '../components/StatusView';
 import SettingsRow, { SettingsRowGroup } from '../components/SettingsRow';
 import { useActiveWorkoutBarPadding } from '../components/ActiveWorkoutBar';
@@ -311,6 +312,10 @@ const FoodDetailScreen: React.FC<FoodDetailScreenProps> = ({ navigation, route }
           provider_verified={food.provider_verified}
           customNutrients={selectedCustomNutrients}
         />
+
+        {food.nutriScore ? (
+          <NutriScoreBadge nutriScore={food.nutriScore} />
+        ) : null}
 
         <View className="bg-surface rounded-xl p-4">
           <Text className="text-text-secondary text-sm mb-2">Serving</Text>

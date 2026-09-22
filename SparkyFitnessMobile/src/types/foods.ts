@@ -1,3 +1,5 @@
+import type { FoodHealthScore } from '@workspace/shared';
+
 export interface FoodDefaultVariant {
   id?: string;
   serving_size: number;
@@ -42,6 +44,8 @@ export interface FoodItem {
   // server-relative (`/uploads/foods/<id>/...`); provider images that could not
   // be downloaded stay absolute and are hotlinked.
   images?: string[] | null;
+  /** Computed by the server on read. */
+  health_score?: FoodHealthScore;
   default_variant: FoodDefaultVariant;
 }
 
