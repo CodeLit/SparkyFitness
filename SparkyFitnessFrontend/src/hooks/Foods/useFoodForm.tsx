@@ -57,6 +57,16 @@ interface UseCustomFoodFormProps {
 
 type GroupedFormFoodVariant = FormFoodVariantWithEquivalents;
 
+interface FoodFormData {
+  name: string;
+  brand: string;
+  is_quick_food: boolean;
+  barcode: string;
+  notes: string;
+  added_sugars: number | undefined;
+  fruit_veg_legume_percent: number | undefined;
+}
+
 type VariantMeta = {
   manualUnitConversionPending: boolean;
   aiEstimatedUnit: string | null;
@@ -376,11 +386,13 @@ export function useCustomFoodForm({
   // new photo ahead of an existing one before saving.
   const [imageItems, setImageItems] = useState<PickerImage[]>([]);
   const [barcodeConflictFoodName, setBarcodeConflictFoodName] = useState('');
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FoodFormData>({
     name: '',
     brand: '',
     is_quick_food: false,
     barcode: '',
+    added_sugars: undefined,
+    fruit_veg_legume_percent: undefined,
   });
 
   // Provider nutrient values the user mapped onto this food (custom nutrient
@@ -547,6 +559,8 @@ export function useCustomFoodForm({
         brand: food.brand || '',
         is_quick_food: food.is_quick_food || false,
         barcode: food.barcode || '',
+        added_sugars: food.added_sugars ?? undefined,
+        fruit_veg_legume_percent: food.fruit_veg_legume_percent ?? undefined,
       });
       // A provider search result has no `images` array yet — its photo is the
       // single upstream `image_url`. Seed the picker with it so importing
@@ -1098,7 +1112,10 @@ export function useCustomFoodForm({
     [variants, originalVariants, variantMeta]
   );
 
-  const updateField = (field: string, value: string | boolean) => {
+  const updateField = (
+    field: string,
+    value: string | boolean | number | undefined
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -1170,6 +1187,9 @@ export function useCustomFoodForm({
         is_quick_food: formData.is_quick_food,
         is_custom: true,
         barcode: formData.barcode.trim() || null,
+        added_sugars: formData.added_sugars ?? null,
+        fruit_veg_legume_percent: formData.fruit_veg_legume_percent ?? null,
+        provider_nutriscore_grade: food?.provider_nutriscore_grade,
         provider_external_id: food?.provider_external_id,
         provider_type: food?.provider_type,
         provider_verified: food?.provider_verified,

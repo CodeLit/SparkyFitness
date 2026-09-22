@@ -93,7 +93,19 @@
   },
   "foods": {
     "providerVerified": "Verified food",
-    "removeNutrient": "Remove {{nutrient}}"
+    "removeNutrient": "Remove {{nutrient}}",
+    "healthScore": {
+      "nutriScoreProvider": "Nutri-Score {{grade}} (from Open Food Facts)",
+      "nutriScoreComputed": "Nutri-Score {{grade}} (calculated from nutrients)",
+      "warnings": {
+        "calories": "High in calories",
+        "sugars": "High in sugars",
+        "added_sugars": "High in added sugar",
+        "saturated_fat": "High in saturated fat",
+        "trans_fat": "High in trans fat",
+        "sodium": "High in sodium"
+      }
+    }
   },
   "medications": {
     "tabs": {
@@ -1367,7 +1379,12 @@
       "timeFormat12Lower": "12-hour am/pm (2:30 pm)",
       "timeFormat12Upper": "12-hour AM/PM (2:30 PM)",
       "timeFormat24": "24-hour (14:30)",
-      "timezone": "Timezone"
+      "timezone": "Timezone",
+      "frontOfPackRegion": "Front-of-pack warnings",
+      "frontOfPackRegionNone": "None",
+      "frontOfPackRegionBrazil": "Brazil (ANVISA)",
+      "frontOfPackRegionChile": "Chile",
+      "frontOfPackRegionMexico": "Mexico"
     },
     "waterTracking": {
       "title": "Water Tracking",
@@ -3782,7 +3799,11 @@
     "syncConfirmationDescriptionWithPhotos": "Do you want to update all your past diary entries for this food with the new nutrition and photos? Updating photos replaces photos you set on individual diary entries, and can't be undone.",
     "syncConfirmationConfirm": "Update",
     "syncConfirmationConfirmWithPhotos": "Update nutrition & photos",
-    "syncConfirmationNutritionOnly": "Update nutrition only"
+    "syncConfirmationNutritionOnly": "Update nutrition only",
+    "addedSugarsLabel": "Added sugars (g per 100 g/ml)",
+    "fruitVegLegumePercentLabel": "Fruit, vegetables & legumes (%)",
+    "unknown": "Unknown",
+    "healthScoreHelp": "Used for the Nutri-Score and front-of-pack warnings. Leave added sugars empty if the label does not state them."
   },
   "customMeasurements": {
     "title": "Custom Measurements - {{date}}",

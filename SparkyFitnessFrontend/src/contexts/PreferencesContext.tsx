@@ -31,7 +31,11 @@ import {
 } from '@/hooks/Settings/useWaterContainers';
 import { getErrorMessage } from '@/utils/api';
 import { CalorieGoalAdjustmentMode } from '@/utils/calorieCalculations';
-import { GoalMode, GoalModeCalculationMethod } from '@workspace/shared';
+import {
+  GoalMode,
+  GoalModeCalculationMethod,
+  type FrontOfPackRegion,
+} from '@workspace/shared';
 
 import {
   kgToLbs,
@@ -113,6 +117,8 @@ interface PreferencesContextType {
   selectedDiet: string;
   firstDayOfWeek: DayOfWeek;
   measurementDecimalPlaces: number;
+  frontOfPackRegion: FrontOfPackRegion;
+  setFrontOfPackRegion: (region: FrontOfPackRegion) => void;
   goalMode: GoalMode;
   goalModeCalculationMethod: GoalModeCalculationMethod;
   goalModeCustomPercentage: number;
@@ -226,6 +232,7 @@ export interface DefaultPreferences {
   added_sugar_algorithm: AddedSugarAlgorithm;
   first_day_of_week: number;
   measurement_decimal_places: number;
+  front_of_pack_region: FrontOfPackRegion;
   goal_mode: GoalMode;
   goal_mode_calculation_method: GoalModeCalculationMethod;
   goal_mode_custom_percentage: number;
@@ -333,6 +340,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [firstDayOfWeek, setFirstDayOfWeekState] = useState<DayOfWeek>(0);
   const [measurementDecimalPlaces, setMeasurementDecimalPlacesState] =
     useState<number>(0);
+  const [frontOfPackRegion, setFrontOfPackRegionState] =
+    useState<FrontOfPackRegion>('none');
   const [goalMode, setGoalModeState] = useState<GoalMode>('maintain');
   const [goalModeCalculationMethod, setGoalModeCalculationMethodState] =
     useState<GoalModeCalculationMethod>('manual');
@@ -723,6 +732,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
         setSelectedDietState(data.selected_diet || 'balanced');
         setFirstDayOfWeekState(data.first_day_of_week ?? 0);
         setMeasurementDecimalPlacesState(data.measurement_decimal_places ?? 0);
+        setFrontOfPackRegionState(data.front_of_pack_region || 'none');
         setGoalModeState(data.goal_mode || 'maintain');
         setGoalModeCalculationMethodState(
           data.goal_mode_calculation_method || 'manual'
@@ -894,6 +904,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
         first_day_of_week: newPrefs?.firstDayOfWeek ?? firstDayOfWeek,
         measurement_decimal_places:
           newPrefs?.measurementDecimalPlaces ?? measurementDecimalPlaces,
+        front_of_pack_region: newPrefs?.frontOfPackRegion ?? frontOfPackRegion,
         goal_mode: newPrefs?.goalMode ?? goalMode,
         goal_mode_calculation_method:
           newPrefs?.goalModeCalculationMethod ?? goalModeCalculationMethod,
@@ -954,6 +965,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
       selectedDiet,
       firstDayOfWeek,
       measurementDecimalPlaces,
+      frontOfPackRegion,
       goalMode,
       goalModeCalculationMethod,
       goalModeCustomPercentage,
@@ -1197,10 +1209,12 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
       selectedDiet,
       firstDayOfWeek,
       measurementDecimalPlaces,
+      frontOfPackRegion,
       goalMode,
       goalModeCalculationMethod,
       goalModeCustomPercentage,
       setMeasurementDecimalPlaces: setMeasurementDecimalPlacesState,
+      setFrontOfPackRegion: setFrontOfPackRegionState,
       setGoalMode,
       setGoalModeCalculationMethod,
       setGoalModeCustomPercentage,
@@ -1290,6 +1304,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
       selectedDiet,
       firstDayOfWeek,
       measurementDecimalPlaces,
+      frontOfPackRegion,
       goalMode,
       goalModeCalculationMethod,
       goalModeCustomPercentage,
