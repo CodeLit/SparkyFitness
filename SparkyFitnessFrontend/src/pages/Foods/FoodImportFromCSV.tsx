@@ -69,7 +69,9 @@ export interface CSVData {
   calcium: number;
   iron: number;
   is_default: boolean;
-  [key: string]: string | number | boolean;
+  added_sugars?: number | null;
+  fruit_veg_legume_percent?: number | null;
+  [key: string]: string | number | boolean | null | undefined;
 }
 
 const generateUniqueId = () =>
@@ -172,9 +174,15 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
     'is_default',
   ];
 
+  // Food-level health score inputs (per 100 g/ml). Optional so existing files
+  // stay valid, and unlike the nutrients a blank cell means "unknown": it
+  // becomes null, never 0, because 0 added sugar is a claim about the food.
+  const healthScoreHeaders = ['added_sugars', 'fruit_veg_legume_percent'];
+  const importHeaders = [...requiredHeaders, ...healthScoreHeaders];
+
   // Numeric columns feed decimal-format auto-detection; everything except
   // the text/boolean/unit columns above.
-  const numericColumns = requiredHeaders.filter(
+  const numericColumns = importHeaders.filter(
     (h) => !textFields.has(h) && !booleanFields.has(h) && h !== 'serving_unit'
   );
 
@@ -195,10 +203,13 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
     const buildValue = (
       header: string,
       raw: string
-    ): string | number | boolean => {
+    ): string | number | boolean | null => {
       const value = raw.trim();
       if (booleanFields.has(header)) {
         return value.toLowerCase() === 'true';
+      }
+      if (healthScoreHeaders.includes(header)) {
+        return toNumber(value, format) ?? null;
       }
       if (!textFields.has(header) && header !== 'serving_unit') {
         // toNumber (not parseFloat) so a locale-comma decimal like "80,2"
@@ -226,7 +237,7 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
     return rows.map((rawRow) => {
       const row: CSVData = { id: generateUniqueId() } as CSVData;
       if (mapping) {
-        requiredHeaders.forEach((header) => {
+        importHeaders.forEach((header) => {
           const fileColumn = mapping[header];
           row[header] = buildValue(
             header,
@@ -290,7 +301,7 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
       }
     } else {
       setFileHeaders(fileHeaders);
-      setHeaderMapping(suggestHeaderMapping(requiredHeaders, fileHeaders));
+      setHeaderMapping(suggestHeaderMapping(importHeaders, fileHeaders));
       setRawCsvText(text);
       setShowMapping(true);
       if (!silent) {
@@ -458,15 +469,15 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
         calcium: 360,
         iron: 366,
         is_default: 'TRUE',
+        added_sugars: 12,
+        fruit_veg_legume_percent: '',
       },
     ];
 
-    const headerString = requiredHeaders.join(',');
+    const headerString = importHeaders.join(',');
     const rowsString = sampleData
       .map((row) =>
-        requiredHeaders
-          .map((header) => row[header as keyof typeof row])
-          .join(',')
+        importHeaders.map((header) => row[header as keyof typeof row]).join(',')
       )
       .join('\n');
     const csvContent = `${headerString}\n${rowsString}`;
@@ -485,7 +496,7 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
   const handleEditCell = (
     id: string,
     field: string,
-    value: string | number | boolean
+    value: string | number | boolean | null
   ) => {
     setCsvData((prevData) =>
       prevData.map((row) => (row.id === id ? { ...row, [field]: value } : row))
@@ -525,7 +536,7 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
       is_default: csvData.length === 0,
     };
     if (headers.length === 0) {
-      setHeaders(requiredHeaders);
+      setHeaders(importHeaders);
     }
     setCsvData((prev) => [...prev, newRow]);
   };
@@ -739,7 +750,7 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
             <CsvHeaderMappingDialog
               open={showMapping}
               onOpenChange={setShowMapping}
-              requiredHeaders={requiredHeaders}
+              requiredHeaders={importHeaders}
               fileHeaders={fileHeaders}
               headerMapping={headerMapping}
               onHeaderMappingChange={setHeaderMapping}
@@ -904,6 +915,29 @@ const ImportFromCSV = ({ onSave }: ImportFromCSVProps) => {
                                   }
                                   required={header === 'name'}
                                   className="w-full md:w-40"
+                                />
+                              ) : healthScoreHeaders.includes(header) ? (
+                                // Empty stays empty: null means "unknown".
+                                <Input
+                                  type="number"
+                                  value={(row[header] as number | null) ?? ''}
+                                  onChange={(e) =>
+                                    handleEditCell(
+                                      row.id,
+                                      header,
+                                      Number.isNaN(e.target.valueAsNumber)
+                                        ? null
+                                        : e.target.valueAsNumber
+                                    )
+                                  }
+                                  min="0"
+                                  max={
+                                    header === 'fruit_veg_legume_percent'
+                                      ? '100'
+                                      : undefined
+                                  }
+                                  step="any"
+                                  className="w-full md:w-20"
                                 />
                               ) : (
                                 // Generic number input

@@ -954,6 +954,9 @@ interface BulkImportFoodData {
   vitamin_c?: NumericInput;
   calcium?: NumericInput;
   iron?: NumericInput;
+  /** Food-level, per 100 g/ml; see the health score migration. */
+  added_sugars?: NumericInput;
+  fruit_veg_legume_percent?: NumericInput;
   glycemic_index?: string | null;
   custom_nutrients?: Record<string, unknown> | null;
   source?: string | null;
@@ -974,6 +977,8 @@ interface GroupedImportFood {
   provider_type?: string | null;
   provider_verified?: BooleanInput;
   images?: string[] | null;
+  added_sugars: number | null;
+  fruit_veg_legume_percent: number | null;
   variants: BulkImportFoodData[];
 }
 
@@ -1016,9 +1021,20 @@ async function createFoodsInBulk(
           provider_type: variant.provider_type || null,
           provider_verified: variant.provider_verified,
           images: resolveImageInput(variant),
+          added_sugars: null,
+          fruit_veg_legume_percent: null,
           variants: [],
         };
       }
+      // Composition fields belong to the food, but the CSV repeats them per
+      // variant row: the first row that states a value wins.
+      const healthScoreInputs = sanitizeHealthScoreInputs({
+        added_sugars: variant.added_sugars,
+        fruit_veg_legume_percent: variant.fruit_veg_legume_percent,
+      });
+      acc[key].added_sugars ??= healthScoreInputs.added_sugars;
+      acc[key].fruit_veg_legume_percent ??=
+        healthScoreInputs.fruit_veg_legume_percent;
       if (sanitizeBoolean(variant.provider_verified) === true) {
         acc[key].provider_verified = true;
       }
@@ -1100,6 +1116,10 @@ async function createFoodsInBulk(
              shared_with_public = $3,
              is_quick_food = $4,
              provider_verified = CASE WHEN $5 THEN TRUE ELSE provider_verified END,
+             -- A missing or blank column arrives as null and keeps the stored
+             -- value, like the variant nutrients below.
+             added_sugars = COALESCE($6, added_sugars),
+             fruit_veg_legume_percent = COALESCE($7, fruit_veg_legume_percent),
              updated_at = now()
            WHERE id = $1`,
           [
@@ -1108,14 +1128,17 @@ async function createFoodsInBulk(
             sanitizeBoolean(food.shared_with_public) ?? false,
             sanitizeBoolean(food.is_quick_food) ?? false,
             sanitizeBoolean(food.provider_verified) ?? false,
+            food.added_sugars,
+            food.fruit_veg_legume_percent,
           ]
         );
         foodId = existingFoodId;
         totalFoodsUpdated++;
       } else {
         const foodResult = await client.query(
-          `INSERT INTO foods (name, brand, is_custom, user_id, shared_with_public, is_quick_food,barcode,provider_external_id,provider_type,provider_verified, images, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, now(), now())
+          `INSERT INTO foods (name, brand, is_custom, user_id, shared_with_public, is_quick_food,barcode,provider_external_id,provider_type,provider_verified, images,
+             added_sugars, fruit_veg_legume_percent, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, now(), now())
            RETURNING id`,
           [
             food.name,
@@ -1129,6 +1152,8 @@ async function createFoodsInBulk(
             food.provider_type || null,
             sanitizeBoolean(food.provider_verified) ?? false,
             JSON.stringify(resolveImageInput(food)),
+            food.added_sugars,
+            food.fruit_veg_legume_percent,
           ]
         );
         foodId = foodResult.rows[0].id;

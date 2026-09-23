@@ -201,6 +201,9 @@ export interface CSVData {
   vitamin_c: number;
   calcium: number;
   iron: number;
+  /** Food-level, per 100 g/ml; null means unknown. */
+  added_sugars?: number | null;
+  fruit_veg_legume_percent?: number | null;
   custom_nutrients?: Record<string, string | number>; // New field for custom nutrients
 }
 
