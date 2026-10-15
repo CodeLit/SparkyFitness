@@ -76,3 +76,8 @@ dossier sans titre/
 
 # Local MCP server config (contains bearer tokens)
 .mcp.json
+
+# Command Code project scratch — settings.json is shared (points at .claude/skills);
+# learned taste and the /import report are machine-local
+/.commandcode/taste/
+/.commandcode/import-report.md
