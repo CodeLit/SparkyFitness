@@ -11,6 +11,7 @@ import {
   DEFAULT_CUSTOM_CALORIE_SAFETY_FLOOR,
   CHART_SCALE_MODES,
   DEFAULT_CHART_SCALE_MODE,
+  FRONT_OF_PACK_REGIONS,
   type UserPreferencesMutator,
   userPreferencesMutatorSchema,
 } from '@workspace/shared';
@@ -31,10 +32,6 @@ type CalorieSafetyFloorPreferenceInput = Partial<
     'calorie_safety_floor_mode' | 'calorie_safety_floor_value'
   >
 >;
-type ChartScaleModePreferenceInput = Partial<
-  Pick<UserPreferencesMutator, 'chart_scale_mode'>
->;
-
 function validateAdaptiveActivity(preferences: UserPreferencesMutator): void {
   if (
     !userPreferencesMutatorSchema.shape.adaptive_activity_separate.safeParse(
@@ -177,21 +174,24 @@ async function validateCalorieSafetyFloor(
     }
   }
 }
-async function validateChartScaleMode(
-  preferenceData: ChartScaleModePreferenceInput
-) {
-  if (
-    preferenceData.chart_scale_mode !== undefined &&
-    !(CHART_SCALE_MODES as readonly string[]).includes(
-      preferenceData.chart_scale_mode
-    )
-  ) {
-    throw Object.assign(
-      new Error(
-        `Invalid chart_scale_mode: '${preferenceData.chart_scale_mode}'. Must be one of: ${CHART_SCALE_MODES.join(', ')}.`
-      ),
-      { status: 400 }
-    );
+type EnumPreferenceInput = Partial<
+  Pick<UserPreferencesMutator, 'chart_scale_mode' | 'front_of_pack_region'>
+>;
+const ENUM_PREFERENCES: Record<keyof EnumPreferenceInput, readonly string[]> = {
+  chart_scale_mode: CHART_SCALE_MODES,
+  front_of_pack_region: FRONT_OF_PACK_REGIONS,
+};
+async function validateEnumPreferences(preferenceData: EnumPreferenceInput) {
+  for (const [field, allowed] of Object.entries(ENUM_PREFERENCES)) {
+    const value = preferenceData[field as keyof EnumPreferenceInput];
+    if (value !== undefined && !allowed.includes(value)) {
+      throw Object.assign(
+        new Error(
+          `Invalid ${field}: '${value}'. Must be one of: ${allowed.join(', ')}.`
+        ),
+        { status: 400 }
+      );
+    }
   }
 }
 function getDefaultPreferences() {
@@ -207,6 +207,7 @@ function getDefaultPreferences() {
     calorie_safety_floor_value: DEFAULT_CUSTOM_CALORIE_SAFETY_FLOOR,
     chart_scale_mode: DEFAULT_CHART_SCALE_MODE,
     goal_mode_weekly_change_kg: 0,
+    front_of_pack_region: 'none',
   };
 }
 async function updateUserPreferences(
@@ -220,7 +221,7 @@ async function updateUserPreferences(
     await validateTimeFormat(preferenceData);
     await validateGoalMode(preferenceData);
     await validateCalorieSafetyFloor(preferenceData);
-    await validateChartScaleMode(preferenceData);
+    await validateEnumPreferences(preferenceData);
     const updatedPreferences = await preferenceRepository.updateUserPreferences(
       targetUserId,
       preferenceData
@@ -341,7 +342,8 @@ async function upsertUserPreferences(
     await validateTimeFormat(preferenceData);
     await validateGoalMode(preferenceData);
     await validateCalorieSafetyFloor(preferenceData);
-    await validateChartScaleMode(preferenceData);
+    await validateEnumPreferences(preferenceData);
+    preferenceData.user_id = authenticatedUserId; // Ensure user_id is set from authenticated user
     // Provide a default for calorie_goal_adjustment_mode if it's not present
     if (!preferenceData.calorie_goal_adjustment_mode) {
       preferenceData.calorie_goal_adjustment_mode = 'dynamic';

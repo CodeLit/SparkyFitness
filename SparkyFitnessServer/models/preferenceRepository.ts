@@ -142,6 +142,7 @@ async function updateUserPreferences(
         calorie_safety_floor_mode = COALESCE($45, calorie_safety_floor_mode),
         calorie_safety_floor_value = COALESCE($46, calorie_safety_floor_value),
         chart_scale_mode = COALESCE($53, chart_scale_mode),
+        front_of_pack_region = COALESCE($59, front_of_pack_region),
         updated_at = now()
       WHERE user_id = $28
       RETURNING *`,
@@ -204,6 +205,7 @@ async function updateUserPreferences(
         preferenceData.voice_input_enabled,
         preferenceData.adaptive_activity_separate,
         preferenceData.goal_mode_weekly_change_kg,
+        preferenceData.front_of_pack_region,
       ]
     );
     return result.rows[0];
@@ -304,6 +306,7 @@ async function upsertUserPreferences(
        target_bedtime,
        chart_scale_mode,
        adaptive_activity_separate,
+       front_of_pack_region,
        created_at, updated_at
      ) VALUES (
        $1, COALESCE($2, 'yyyy-MM-dd'), COALESCE($44, 'HH:mm'), COALESCE($3, 'lbs'), COALESCE($4, 'in'), COALESCE($5, 'km'),
@@ -346,6 +349,7 @@ async function upsertUserPreferences(
        COALESCE($52::time without time zone, '22:30'),
        COALESCE($53, 'time'),
        COALESCE($57, FALSE),
+       COALESCE($59, 'none'),
        now(), now()
      )
      ON CONFLICT (user_id) DO UPDATE SET
@@ -407,6 +411,7 @@ async function upsertUserPreferences(
        time_format = COALESCE($44, user_preferences.time_format),
        -- Read $53 directly rather than EXCLUDED, for the same reason as $47.
        chart_scale_mode = COALESCE($53, user_preferences.chart_scale_mode),
+       front_of_pack_region = COALESCE($59, user_preferences.front_of_pack_region),
        updated_at = now()
      RETURNING *`,
       [
@@ -468,6 +473,7 @@ async function upsertUserPreferences(
         preferenceData.voice_input_enabled,
         preferenceData.adaptive_activity_separate,
         preferenceData.goal_mode_weekly_change_kg,
+        preferenceData.front_of_pack_region,
       ]
     );
     return result.rows[0];

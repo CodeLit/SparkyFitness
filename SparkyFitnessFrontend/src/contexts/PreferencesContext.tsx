@@ -41,6 +41,7 @@ import {
   DEFAULT_CAFFEINE_HALF_LIFE_HOURS,
   DEFAULT_CHART_SCALE_MODE,
   type ChartScaleMode,
+  type FrontOfPackRegion,
   type UserPreferences as SharedUserPreferences,
 } from '@workspace/shared';
 
@@ -131,6 +132,8 @@ interface PreferencesContextType {
   measurementDecimalPlaces: number;
   chartScaleMode: ChartScaleMode;
   setChartScaleMode: (mode: ChartScaleMode) => void;
+  frontOfPackRegion: FrontOfPackRegion;
+  setFrontOfPackRegion: (region: FrontOfPackRegion) => void;
   goalMode: GoalMode;
   goalModeCalculationMethod: GoalModeCalculationMethod;
   adaptiveActivitySeparate: boolean;
@@ -262,6 +265,7 @@ export interface DefaultPreferences {
   first_day_of_week: number;
   measurement_decimal_places: number;
   chart_scale_mode: ChartScaleMode;
+  front_of_pack_region: FrontOfPackRegion;
   goal_mode: GoalMode;
   goal_mode_calculation_method: GoalModeCalculationMethod;
   adaptive_activity_separate?: boolean;
@@ -382,6 +386,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [chartScaleMode, setChartScaleModeState] = useState<ChartScaleMode>(
     DEFAULT_CHART_SCALE_MODE
   );
+  const [frontOfPackRegion, setFrontOfPackRegionState] =
+    useState<FrontOfPackRegion>('none');
   const [goalMode, setGoalModeState] = useState<GoalMode>('maintain');
   const [goalModeCalculationMethod, setGoalModeCalculationMethodState] =
     useState<GoalModeCalculationMethod>('manual');
@@ -802,6 +808,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
         setChartScaleModeState(
           data.chart_scale_mode || DEFAULT_CHART_SCALE_MODE
         );
+        setFrontOfPackRegionState(data.front_of_pack_region || 'none');
         setGoalModeState(data.goal_mode || 'maintain');
         setGoalModeCalculationMethodState(
           data.goal_mode_calculation_method || 'manual'
@@ -1008,6 +1015,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
         measurement_decimal_places:
           newPrefs?.measurementDecimalPlaces ?? measurementDecimalPlaces,
         chart_scale_mode: newPrefs?.chartScaleMode ?? chartScaleMode,
+        front_of_pack_region: newPrefs?.frontOfPackRegion ?? frontOfPackRegion,
         goal_mode: newPrefs?.goalMode ?? goalMode,
         goal_mode_calculation_method:
           newPrefs?.goalModeCalculationMethod ?? goalModeCalculationMethod,
@@ -1093,6 +1101,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
       firstDayOfWeek,
       measurementDecimalPlaces,
       chartScaleMode,
+      frontOfPackRegion,
       goalMode,
       goalModeCalculationMethod,
       adaptiveActivitySeparate,
@@ -1392,6 +1401,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
       firstDayOfWeek,
       measurementDecimalPlaces,
       chartScaleMode,
+      frontOfPackRegion,
       goalMode,
       goalModeCalculationMethod,
       adaptiveActivitySeparate,
@@ -1409,6 +1419,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
       setStandardDrinkGrams,
       setMeasurementDecimalPlaces: setMeasurementDecimalPlacesState,
       setChartScaleMode: setChartScaleModeState,
+      setFrontOfPackRegion: setFrontOfPackRegionState,
       setGoalMode,
       setGoalModeCalculationMethod,
       setGoalModeCustomPercentage,
@@ -1504,6 +1515,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({
       firstDayOfWeek,
       measurementDecimalPlaces,
       chartScaleMode,
+      frontOfPackRegion,
       goalMode,
       goalModeCalculationMethod,
       adaptiveActivitySeparate,
