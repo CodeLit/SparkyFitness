@@ -172,6 +172,7 @@ describe('preferenceRepository bootstrapUserTimezoneIfUnset', () => {
         chart_scale_mode: 'time' as const,
         active_voice_ai_service_id: null,
         voice_input_enabled: false,
+        front_of_pack_region: 'brazil' as const,
       };
       if (operation === 'update') {
         await preferenceRepository.updateUserPreferences('user-1', preferences);
@@ -181,7 +182,8 @@ describe('preferenceRepository bootstrapUserTimezoneIfUnset', () => {
           ...preferences,
         });
       }
-      const [, params] = mockClient.query.mock.calls[0];
+      const [sql, params] = mockClient.query.mock.calls[0];
+      expect(sql).toContain('front_of_pack_region = COALESCE($57');
       expect(params.slice(47)).toEqual([
         true,
         14,
@@ -192,6 +194,7 @@ describe('preferenceRepository bootstrapUserTimezoneIfUnset', () => {
         null,
         true,
         false,
+        'brazil',
       ]);
     }
   );
