@@ -6,6 +6,7 @@ import {
   MIN_CALORIE_SAFETY_FLOOR,
 } from '../../constants/calorieConstants.ts';
 import { CHART_SCALE_MODES } from '../../constants/chartConstants.ts';
+import { FRONT_OF_PACK_REGIONS } from '../../nutrients/foodHealthScore.ts';
 
 export const SUPPORTED_TIME_FORMATS = ['HH:mm', 'h:mm A', 'h:mm a'] as const;
 
@@ -155,6 +156,7 @@ export const userPreferencesInitializerSchema = z.object({
     .optional(),
   chart_scale_mode: z.enum(CHART_SCALE_MODES).optional(),
   adaptive_workout_suggestions: z.boolean().optional(),
+  front_of_pack_region: z.enum(FRONT_OF_PACK_REGIONS).optional(),
   measurement_decimal_places: z.number().int().min(0).optional(),
   use_external_bmr: z.boolean().optional(),
   active_ai_service_id: z.string().uuid().nullable().optional(),
@@ -237,6 +239,7 @@ export const userPreferencesMutatorSchema = z.object({
     .optional(),
   chart_scale_mode: z.enum(CHART_SCALE_MODES).optional(),
   adaptive_workout_suggestions: z.boolean().optional(),
+  front_of_pack_region: z.enum(FRONT_OF_PACK_REGIONS).optional(),
   measurement_decimal_places: z.number().int().min(0).optional(),
   use_external_bmr: z.boolean().optional(),
   active_ai_service_id: z.string().uuid().nullable().optional(),

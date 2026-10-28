@@ -32,7 +32,7 @@ import {
 } from '../middleware/imageUpload.js';
 import { resolveImageInput, toImageArray } from '../utils/imageLocalizer.js';
 import { resolveTemplateStartDay } from '../utils/timezoneLoader.js';
-import { alcoholGramsForServing } from '@workspace/shared';
+import { alcoholGramsForServing, withFoodHealthScore } from '@workspace/shared';
 
 /** A food row as returned by the repository. */
 interface FoodRow {
@@ -82,8 +82,8 @@ async function searchFoods(
         mealType
       );
       return {
-        recentFoods,
-        topFoods,
+        recentFoods: recentFoods.map(withFoodHealthScore),
+        topFoods: topFoods.map(withFoodHealthScore),
       };
     } else {
       // Otherwise, perform a regular search
@@ -103,7 +103,7 @@ async function searchFoods(
         checkCustom,
         limit // Pass the limit to the repository search function
       );
-      return { searchResults: foods };
+      return { searchResults: foods.map(withFoodHealthScore) };
     }
   } catch (error) {
     log(
@@ -132,6 +132,15 @@ async function refreshExistingExternalFoodMetadata(
     existingFood.provider_verified !== true
   ) {
     metadata.provider_verified = true;
+  }
+
+  if (
+    sameProviderIdentity &&
+    foodData.provider_nutriscore_grade &&
+    existingFood.provider_nutriscore_grade !==
+      foodData.provider_nutriscore_grade
+  ) {
+    metadata.provider_nutriscore_grade = foodData.provider_nutriscore_grade;
   }
 
   // Backfill the provider photo onto a food imported before it had one (or
@@ -271,12 +280,12 @@ async function getFoodById(authenticatedUserId: string, foodId: string) {
       );
       if (publicFood && !publicFood.is_custom) {
         // Assuming public foods are not custom
-        return publicFood;
+        return withFoodHealthScore(publicFood);
       }
       throw new Error('Food not found.');
     }
     const food = await foodRepository.getFoodById(foodId, authenticatedUserId);
-    return food;
+    return food && withFoodHealthScore(food);
   } catch (error) {
     log(
       'error',
@@ -515,7 +524,7 @@ async function getFoodsWithPagination(
         providerType
       ),
     ]);
-    return { foods, totalCount };
+    return { foods: foods.map(withFoodHealthScore), totalCount };
   } catch (error) {
     log(
       'error',

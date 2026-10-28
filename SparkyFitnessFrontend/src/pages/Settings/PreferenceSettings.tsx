@@ -23,7 +23,7 @@ import {
   WeightUnit,
   MeasurementUnit,
 } from '@/contexts/PreferencesContext';
-import type { ChartScaleMode } from '@workspace/shared';
+import type { ChartScaleMode, FrontOfPackRegion } from '@workspace/shared';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -48,6 +48,8 @@ export const PreferenceSettings = () => {
     setTimeFormat,
     chartScaleMode,
     setChartScaleMode,
+    frontOfPackRegion,
+    setFrontOfPackRegion,
     itemDisplayLimit,
     setItemDisplayLimit, // Add itemDisplayLimit and setItemDisplayLimit
     autoScaleOpenFoodFactsImports,
@@ -99,6 +101,7 @@ export const PreferenceSettings = () => {
         firstDayOfWeek,
         measurementDecimalPlaces,
         chartScaleMode,
+        frontOfPackRegion,
         timezone,
         loggingLevel: localLoggingLevel,
         standardDrinkGrams,
@@ -227,6 +230,41 @@ export const PreferenceSettings = () => {
                     'settings.preferences.chartScalePoint',
                     'Evenly spaced (every entry gets the same width)'
                   )}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="front_of_pack_region">
+              {t(
+                'settings.preferences.frontOfPackRegion',
+                'Front-of-pack warnings'
+              )}
+            </Label>
+            <Select
+              value={frontOfPackRegion}
+              onValueChange={(value) =>
+                setFrontOfPackRegion(value as FrontOfPackRegion)
+              }
+            >
+              <SelectTrigger id="front_of_pack_region">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">
+                  {t('settings.preferences.frontOfPackRegionNone', 'None')}
+                </SelectItem>
+                <SelectItem value="brazil">
+                  {t(
+                    'settings.preferences.frontOfPackRegionBrazil',
+                    'Brazil (ANVISA)'
+                  )}
+                </SelectItem>
+                <SelectItem value="chile">
+                  {t('settings.preferences.frontOfPackRegionChile', 'Chile')}
+                </SelectItem>
+                <SelectItem value="mexico">
+                  {t('settings.preferences.frontOfPackRegionMexico', 'Mexico')}
                 </SelectItem>
               </SelectContent>
             </Select>

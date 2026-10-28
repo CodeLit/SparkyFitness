@@ -39,6 +39,11 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
+// FoodHealthBadges reads the front-of-pack region; the badge itself has its own suite.
+jest.mock('@/contexts/PreferencesContext', () => ({
+  ...jest.requireActual('@/contexts/PreferencesContext'),
+  usePreferences: () => ({ frontOfPackRegion: 'none' }),
+}));
 jest.mock('@/hooks/use-mobile', () => ({
   useIsMobile: () => false,
 }));

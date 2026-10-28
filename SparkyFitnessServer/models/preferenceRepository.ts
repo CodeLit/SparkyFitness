@@ -140,6 +140,7 @@ async function updateUserPreferences(
         calorie_safety_floor_mode = COALESCE($45, calorie_safety_floor_mode),
         calorie_safety_floor_value = COALESCE($46, calorie_safety_floor_value),
         chart_scale_mode = COALESCE($53, chart_scale_mode),
+        front_of_pack_region = COALESCE($57, front_of_pack_region),
         updated_at = now()
       WHERE user_id = $28
       RETURNING *`,
@@ -200,6 +201,7 @@ async function updateUserPreferences(
         preferenceData.active_voice_ai_service_id,
         'active_voice_ai_service_id' in preferenceData,
         preferenceData.voice_input_enabled,
+        preferenceData.front_of_pack_region,
       ]
     );
     return result.rows[0];
@@ -298,6 +300,7 @@ async function upsertUserPreferences(
        caffeine_half_life_hours,
        target_bedtime,
        chart_scale_mode,
+       front_of_pack_region,
        created_at, updated_at
      ) VALUES (
        $1, COALESCE($2, 'yyyy-MM-dd'), COALESCE($44, 'HH:mm'), COALESCE($3, 'lbs'), COALESCE($4, 'in'), COALESCE($5, 'km'),
@@ -338,6 +341,7 @@ async function upsertUserPreferences(
        -- is why only this INSERT arm failed.
        COALESCE($52::time without time zone, '22:30'),
        COALESCE($53, 'time'),
+       COALESCE($57, 'none'),
        now(), now()
      )
      ON CONFLICT (user_id) DO UPDATE SET
@@ -397,6 +401,7 @@ async function upsertUserPreferences(
        time_format = COALESCE($44, user_preferences.time_format),
        -- Read $53 directly rather than EXCLUDED, for the same reason as $47.
        chart_scale_mode = COALESCE($53, user_preferences.chart_scale_mode),
+       front_of_pack_region = COALESCE($57, user_preferences.front_of_pack_region),
        updated_at = now()
      RETURNING *`,
       [
@@ -456,6 +461,7 @@ async function upsertUserPreferences(
         preferenceData.active_voice_ai_service_id,
         'active_voice_ai_service_id' in preferenceData,
         preferenceData.voice_input_enabled,
+        preferenceData.front_of_pack_region,
       ]
     );
     return result.rows[0];
