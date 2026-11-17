@@ -2,7 +2,10 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { FRONT_OF_PACK_REGIONS, FRONT_OF_PACK_WARNINGS } from '@workspace/shared';
+import {
+  FRONT_OF_PACK_REGIONS,
+  FRONT_OF_PACK_WARNINGS,
+} from '@workspace/shared';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const swaggerScanPaths = [

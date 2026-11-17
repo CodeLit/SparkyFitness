@@ -13,7 +13,6 @@ jest.mock('@/hooks/useAllergenPreferences', () => ({
 
 // FoodHealthBadges reads the front-of-pack region; the badge itself has its own suite.
 jest.mock('@/contexts/PreferencesContext', () => ({
-  ...jest.requireActual('@/contexts/PreferencesContext'),
   usePreferences: () => ({ frontOfPackRegion: 'none' }),
 }));
 jest.mock('@/contexts/ActiveUserContext', () => ({

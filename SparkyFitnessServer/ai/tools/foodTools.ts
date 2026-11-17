@@ -1,6 +1,10 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { addDays, computeFoodHealthScore, todayInZone } from '@workspace/shared';
+import {
+  addDays,
+  computeFoodHealthScore,
+  todayInZone,
+} from '@workspace/shared';
 import { log } from '../../config/logging.js';
 import foodCoreService from '../../services/foodCoreService.js';
 import foodEntryService from '../../services/foodEntryService.js';

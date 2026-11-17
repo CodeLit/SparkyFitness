@@ -62,9 +62,8 @@ interface FoodFormData {
   brand: string;
   is_quick_food: boolean;
   barcode: string;
-  notes: string;
-  added_sugars: number | undefined;
-  fruit_veg_legume_percent: number | undefined;
+  added_sugars?: number;
+  fruit_veg_legume_percent?: number;
 }
 
 type VariantMeta = {
